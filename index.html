@@ -133,10 +133,11 @@ function rc(){$('ch').innerHTML=CH.map((c,i)=>`<div class="li" draggable="true" 
 document.querySelectorAll('.li').forEach(e=>{e.ondragstart=()=>dg=+e.dataset.i;e.ondragover=v=>v.preventDefault();e.ondrop=()=>{const t=+e.dataset.i;if(dg===null||dg===t)return;CH.splice(t,0,CH.splice(dg,1)[0]);dg=null;rc()}})}
 function mv(i,d){const j=i+d;if(j<0||j>=CH.length)return;[CH[i],CH[j]]=[CH[j],CH[i]];rc()}
 // ===== Matching: score = weighted average of lifestyle answers (sleep counts double) =====
-const AX=["Sleep","Cleanliness","Noise","Guests","Budget"],W=[2,1,1,1,1],ME=[.2,.7,.6,.5,.8],MS=[["Ahmed K.",[.5,.6,.7,.4,.7]],["Faisal M.",[.3,.9,.4,.8,.6]],["Omar S.",[.9,.7,.5,.5,.8]]];
+const AX=["Sleep","Cleanliness","Noise","Guests","Budget"],W=[2,1,1,1,1],MS=[["Ahmed K.",[.5,.6,.7,.4,.7]],["Faisal M.",[.3,.9,.4,.8,.6]],["Omar S.",[.9,.7,.5,.5,.8]]];
+let ME=[.3,.35,.2,.5,.8];
+function updME(){const sl=[...document.querySelectorAll('#s2 input')].map(x=>x.value/100);ME=[sl[0],1-sl[2],sl[1],.5,.8]}
 const sc=a=>a.map((v,i)=>1-Math.abs(v-ME[i])),pc=a=>Math.round(sc(a).reduce((s,v,i)=>s+v*W[i],0)/6*100);
-MS.sort((a,b)=>pc(b[1])-pc(a[1]));
-function rm(){$('ml').innerHTML=MS.map((m,i)=>`<div class="mc" onclick="sel=${i};go(6)"><div class="av">🙂</div><div class="i"><b>${m[0]}</b><span class="bd">Verified</span><br>🌙 🔇 🧹 🍳 👥</div><div class="pc">${pc(m[1])}%</div></div>`).join('')}
+function rm(){updME();MS.sort((a,b)=>pc(b[1])-pc(a[1]));$('ml').innerHTML=MS.map((m,i)=>`<div class="mc" onclick="sel=${i};go(6)"><div class="av">🙂</div><div class="i"><b>${m[0]}</b><span class="bd">Verified</span><br>🌙 🔇 🧹 🍳 👥</div><div class="pc">${pc(m[1])}%</div></div>`).join('')}
 // Radar chart (SVG), "Why this score?" panel and friction alert
 function rr(){const m=MS[sel],s=sc(m[1]),cx=150,cy=120,r=85,pt=(v,k)=>[cx+r*v*Math.cos((-90+72*k)*Math.PI/180),cy+r*v*Math.sin((-90+72*k)*Math.PI/180)].join(',');
 const pl=(a,x)=>`<polygon points="${a.map((v,k)=>pt(v,k)).join(' ')}" fill="${x?'none':'rgba(77,102,255,.18)'}" stroke="#4d66ff" stroke-width="2.4" ${x?'stroke-dasharray="6 4"':''}/>`;
@@ -158,7 +159,7 @@ if(!k){h=EX[0].map(e=>`<div>${e[0]}: SAR ${e[1]}<div class="bar"><i style="width
 else{const tot=390;h=EX[1].map(e=>`<div>${e[0]}: SAR ${e[1]}<div class="bar"><i style="width:${e[1]/2}%"></i></div></div>`).join('')+`<div class="pn">Total SAR ${tot} - your half: SAR ${tot/2}. Budget for utilities: SAR 250 ✅</div>`}$('ee').innerHTML=h}
 // ===== Chat: icebreaker questions =====
 const IC=["What time do you usually wake up?","How do you feel about guests?","Early bird or night owl?"];
-function ri(){$('ic').innerHTML=IC.map(q=>`<button class="btn o s" onclick="sd(this.textContent)">${q}</button>`).join('')}
+function ri(){document.querySelector('#s9 .h b').textContent='Chat with '+MS[sel][0].split(' ')[0];$('ic').innerHTML=IC.map(q=>`<button class="btn o s" onclick="sd(this.textContent)">${q}</button>`).join('')}
 function sd(q){$('cm').insertAdjacentHTML('beforeend',`<div class="bub me">${q}</div>`);setTimeout(()=>$('cm').insertAdjacentHTML('beforeend','<div class="bub">Good question! Let me think 😄</div>'),700)}
 // ===== Start guide (manual walkthrough with Prev / Next) =====
 // Each step: [screen number, title, explanation lines]
